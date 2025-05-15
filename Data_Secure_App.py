@@ -93,15 +93,15 @@ if st.session_state.failed_attempts >= 3:
    # Display store data count!
     st.info(f"🔒 Currently storing {len(st.session_state.stored_data)} encrypted data entries.")
 
-if st.session_state.current_page == "Store Data":
-    st.subheader("🔒 Store New Data")
-    user_data = st.text_area("Enter the data you want to store:")
-    passkey = st.text_input("Enter a passkey to encrypt the data:", type="password")
-    confirm_passkey = st.text_input("Confirm your passkey:", type="password")
+elif st.session_state.current_page == "Store Data":
+     st.subheader("🔒 Store New Data")
+     user_data = st.text_area("Enter the data you want to store:")
+     passkey = st.text_input("Enter a passkey to encrypt the data:", type="password")
+     confirm_passkey = st.text_input("Confirm your passkey:", type="password")
 
-if st.button("Encrypt & Store Data"):
-    if user_data and passkey and confirm_passkey:
-        if  passkey != confirm_passkey:
+     if st.button("Encrypt & Store Data"):
+        if user_data and passkey and confirm_passkey:
+           if  passkey != confirm_passkey:
                     st.error(" 🚩 Passkeys do not match. Please try again.")
         else:
            data_id = generate_data_id()
