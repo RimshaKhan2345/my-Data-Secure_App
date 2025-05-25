@@ -78,9 +78,9 @@ if st.session_state.failed_attempts >= 3:
     st.warning("🔏Too many failed attempts. please confirm your identity & login again!")
 
 # Function to display the current page!
-    if st.session_state.current_page == "Home":
-        st.subheader("🎉Welcome to the Secure Data Encryption & Storage App!🎊")
-        st.write("This app allows you to securely encrypt and store your data without leaked your privacy.")
+if st.session_state.current_page == "Home":
+    st.subheader("🎉Welcome to the Secure Data Encryption & Storage App!🎊")
+    st.write("This app allows you to securely encrypt and store your data without leaked your privacy.")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -90,52 +90,51 @@ if st.session_state.failed_attempts >= 3:
         if st.button("Retrieve Data", use_container_width=True):
             change_page("Retrieve Data")
 
-   # Display store data count!
+    # Display store data count!
     st.info(f"🔒 Currently storing {len(st.session_state.stored_data)} encrypted data entries.")
 
 elif st.session_state.current_page == "Store Data":
-     st.subheader("🔒 Store New Data")
-     user_data = st.text_area("Enter the data you want to store:")
-     passkey = st.text_input("Enter a passkey to encrypt the data:", type="password")
-     confirm_passkey = st.text_input("Confirm your passkey:", type="password")
+    st.subheader("🔒 Store New Data")
+    user_data = st.text_area("Enter the data you want to store:")
+    passkey = st.text_input("Enter a passkey to encrypt the data:", type="password")
+    confirm_passkey = st.text_input("Confirm your passkey:", type="password")
 
-     if st.button("Encrypt & Store Data"):
+    if st.button("Encrypt & Store Data"):
         if user_data and passkey and confirm_passkey:
-           if  passkey != confirm_passkey:
-                    st.error(" 🚩 Passkeys do not match. Please try again.")
+            if passkey != confirm_passkey:
+                st.error(" 🚩 Passkeys do not match. Please try again.")
+            else:
+                data_id = generate_data_id()
+
+                # Hash the passkey for storage!
+                hashed_passkey = hash_passkey(passkey)
+
+                # Encrypt the data!
+                encrypted_data = encrypt_data(user_data, passkey)
+                st.session_state.stored_data[data_id] = {
+                    "encrypted_data": encrypted_data,
+                    "hash": hashed_passkey,
+                }
+
+                st.success(" ✔ Data stored successfully!")
+                st.code(data_id, language='text')
+                st.info("🔑 Keep this ID safe to retrieve your data later.")
         else:
-           data_id = generate_data_id()
-
-           # Hash the passkey for storage!
-           hashed_passkey = hash_passkey(passkey)
-
-           # Encrypt the data!
-           encrypted_data = encrypt_data(user_data, passkey)
-           st.session_state.stored_data[data_id] = {
-            "encrypted_data": encrypted_data,
-            "passkey": hashed_passkey,
-            }
-
-           st.success(" ✔ Data stored successfully!")
-           st.code(data_id, language='text')
-           st.info("🔑 Keep this ID safe to retrieve your data later.")
-
-    else:
             st.error("🚩 All fields are required!")
 
 elif st.session_state.current_page == "Retrieve Data":
-        st.subheader("🔑 Retrieve Data")
+    st.subheader("🔑 Retrieve Data")
 
 #Show attempts left!
-        attempts_remaining = 3 - st.session_state.failed_attempts
-        st.info(f"attempts_remaining: {attempts_remaining}")
+    attempts_remaining = 3 - st.session_state.failed_attempts
+    st.info(f"attempts_remaining: {attempts_remaining}")
 
-        data_id = st.text_input("Enter the data ID to retrieve:")
-        passkey = st.text_input("Enter the passkey to decrypt the data:", type="password")
+    data_id = st.text_input("Enter the data ID to retrieve:")
+    passkey = st.text_input("Enter the passkey to decrypt the data:", type="password")
 
-        if st.button("Decrypt Data"):
-            if data_id and passkey:
-                if data_id in st.session_state.stored_data:
+    if st.button("Decrypt Data"):
+        if data_id and passkey:
+            if data_id in st.session_state.stored_data:
                     encrypted_text = st.session_state.stored_data[data_id]['encrypted_text']
                     decrypted_text = decrypt_data(encrypted_text, passkey, data_id)
 
@@ -145,8 +144,7 @@ elif st.session_state.current_page == "Retrieve Data":
                        st.code(decrypted_text, language='text')
                     else:
                         st.error(f"🚩 Incorrect passkey! Attempts remaining: {3 - st.session_state.failed_attempts}")
-                else:
-                    st.error("🚩 Failed to decrypt the data. Please check your passkey or data ID.")
+                        st.error("🚩 Failed to decrypt the data. Please check your passkey or data ID.")
             else:
                 st.error("🚨Data ID not found!")
 
@@ -158,7 +156,7 @@ elif st.session_state.current_page == "Retrieve Data":
             st.rerun()
         else:
             st.warning(" 🚩Both fields are required!.")
-            
+
 elif st.session_state.current_page == "login":
      st.subheader("🔑 Reauthoraization Required")
 
